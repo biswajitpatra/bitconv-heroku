@@ -12,7 +12,7 @@ body, html {
    padding-right:3%;
    border-style:dashed;
    border-color:rgb(58, 173, 58);
-   border-width:7px;
+   border-width:0px;
 }
 .button {
     -webkit-user-select: none;  
