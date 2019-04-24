@@ -1,1 +1,1 @@
-web: gunicorn cetdc:app --log-file=-
+web: gunicorn pyserver:app --log-file=-
