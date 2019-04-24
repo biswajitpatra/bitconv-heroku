@@ -29,4 +29,6 @@ def home():
 @app.route("/favicon.ico")
 def logo():
     return send_from_directory(app.root_path,"favicon.ico")
-app.run()
+
+
+app.run(debug=True)
