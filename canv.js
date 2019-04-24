@@ -183,7 +183,7 @@ function show() {
     make_img("path/wheel.png", box.x + box.xd, box.y + box.yd, wheels.bot, wheels.bot,grot);
 
     //ctx.fillStyle = "white";
-    ctx.fillStyle = 'rgba(0,255,0,0.01)';
+    ctx.fillStyle = 'rgba(0,255,0,0.1)';
     //ctx.globalAlpha = 0.01;
     ctx.fillRect(box.x, box.y, box.xd, box.yd);
     //ctx.globalAlpha = 1.0;
