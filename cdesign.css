@@ -1,0 +1,19 @@
+body, html {
+    height:100%;
+    overflow:hidden;
+    font: 80px "Courier", Tahoma, Verdana, sans-serif; 
+  }
+
+  #pass{
+   position:absolute;
+   font:bold 80px "Courier";
+   background: transparent;
+    border: none;
+    outline: none;
+    color: transparent;
+  text-shadow: 0 0 0 rgb(151, 250, 151);
+  
+  left: 50%;
+top: 50%;
+transform: translate(-50%, -50%);
+  }
