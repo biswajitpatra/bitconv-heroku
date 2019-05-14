@@ -36,4 +36,7 @@ def home():
 @app.route("/favicon.ico")
 def logo():
     return send_from_directory(app.root_path,"favicon.ico",cache_timeout=0)
-app.run()
+
+
+if __name__ == '__main__':
+   app.run(debug = True)
