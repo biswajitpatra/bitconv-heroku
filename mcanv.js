@@ -27,7 +27,7 @@ var columns = ctx.width/font_size;
 var drops = [];
 for(var x = 0; x < columns; x++)
 	drops[x] = 1; 
-
+//let userid=localStorage["userid"]||"error";
 
 
 let passw="";
@@ -35,6 +35,33 @@ let images={};
 let grot=0.0174;
 let blink="rgb(0,40,0)";
 let login_text="LOGIN";
+
+
+
+/*
+window.onpaint=function(){
+    if(userid=="error"){    
+        let xmlHttp=new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            userid=xmlHttp.responseText;
+        }
+        xmlHttp.open("GET","/usadd/bitdroid/"+(new Date).getTime(),true);
+        xmlHttp.send(null);
+    }
+    else{
+        let xmlHttp=new XMLHttpRequest();
+
+        // xmlHttp.onreadystatechange = function() { 
+        //if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            //userid=xmlHttp.responseText;
+        //}
+        xmlHttp.open("GET","usupd/bitdroid/"+userid+"/"+(new Date).getTime(),true);
+        xmlHttp.send(null);
+    }
+};*/
+
+
 window.addEventListener("resize",function(){ 
 
     ctx.width = window.innerWidth;
@@ -153,11 +180,13 @@ function passkey(elem){
        passw+=elem;
        let xmlHttp=new XMLHttpRequest();
        xmlHttp.onreadystatechange = function() { 
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            if(xmlHttp.responseText=="true")
-            window.location.href=window.location.href+"inner";
-       }
-       xmlHttp.open("GET","/verifybitconv/"+passw,true);
+            if (this.readyState == 4 && this.status == 200)
+                if(this.responseText!="false"){
+                localStorage["userid"]=this.responseText;
+                alert(this.responseText);
+                window.location.href=window.location.href+"inner/"+localStorage["userid"];}
+           }
+       xmlHttp.open("GET","/verify/bitconv/"+passw,true);
        xmlHttp.send(null);         
     }   
 }
