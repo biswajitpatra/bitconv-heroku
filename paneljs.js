@@ -1,3 +1,10 @@
+function updateonline(){
+    let xmlh=new XMLHttpRequest();
+    xmlh.open("GET","/usupd/bitconv/"+localStorage["userid"]);
+    xmlh.send(null);
+}
+let upd=setInterval(updateonline,10000);
+
 let video = document.getElementById("video");
 
 if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
@@ -6,5 +13,6 @@ if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
         video.play();
     })
 }
+
 
 

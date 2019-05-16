@@ -69,16 +69,17 @@ def inner(userid):
 #userplaces are bitconv,bitdroid
 #@app.route("/usadd/<userplace>/<int:time>")
 def useradd(userplace,time):
-    print("user added")
     db.session.add(userlogins(time,userplace,time,True))
-    db.session.commit()   
+    db.session.commit()
+    print("user added")
 
+@app.route("/inner/usupd/<userplace>/<int:userid>")
 @app.route("/usupd/<userplace>/<int:userid>")
 def userupdate(userplace,userid):
-    print("user updated")
     user=userlogins.query.filter_by(userid=userid).first()
     user.rtime=int(time.time())
     db.session.commit()
+    print("user updated")
     return "true"
     
 @app.route("/")
