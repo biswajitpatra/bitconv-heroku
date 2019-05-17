@@ -2,32 +2,37 @@
 <head>
     <title>BIT PANEL</title>
     <meta charset="utf-8">
-    
+    <link href="path/panelcss.css" rel="stylesheet">
 </head>
 <body style="height:100%">
 <div id="top">  
-    <div id="availability">
-        <div class="bitpc">
-            # ONLINE
-        </div>
-        <div class="bitdroid">
-            # OFFLINE
-        </div>
+    <div id="availability" class="top3">
+        <button id="bitpc">
+            BITPC
+        </dbutton>
+        <button id="bitdroid">
+            BITDROID
+        </button>
     </div> 
-    <video id="video" autoplay></video>
-    <div id="statistics">
-        SCROLLED VIEW
+    <video id="video" autoplay class="top3"></video>
+    <div id="statistics" class="top3">
+        <div id="userid">
+                USER ID
+        </div>
+        <div id="scrview">
+              SCROLLED VIEW
+        </div>
     </div>
 </div>
 
 <div id="middle">
-     <input id="cominput" placeholder=">>"></input>
+     <textarea id="cominput" placeholder=">> YOUR COMMAND HERE........." oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'></textarea>
      <div id='history'>scolling history</div>
 </div>
 
 
 <div id="bottom">
-      <div id ="filebase">FILE INPUT</div>
+      <div id ="filebase">FILE INPUT    ■ ■ ■</div>
 </div>
 <script src="path/paneljs.js"></script>
 </body>

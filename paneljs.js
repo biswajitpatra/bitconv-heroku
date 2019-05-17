@@ -14,5 +14,6 @@ if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
     })
 }
 
+document.getElementById("userid").innerText="USER ID : "+localStorage["userid"];
 
 
