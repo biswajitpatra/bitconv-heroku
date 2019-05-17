@@ -186,8 +186,13 @@ function passkey(elem){
                 alert(this.responseText);
                 window.location.href=window.location.href+"inner/"+localStorage["userid"];}
            }
+       let data =JSON.stringify({"passkey":pasw,"userplace":"bitconv"});
+       xmlHttp.open("POST", "", true);
+       xmlHttp.setRequestHeader("Content-Type", "application/json");
+       xmlHttp.send(data);
+       /*
        xmlHttp.open("GET","/verify/bitconv/"+passw,true);
-       xmlHttp.send(null);         
+       xmlHttp.send(null);*/         
     }   
 }
 function show() {

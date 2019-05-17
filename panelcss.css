@@ -25,6 +25,7 @@ body,html{
   height: 75%;
   overflow: scroll;
   background-color: #23bf23;
+  padding:1%;
 }
 #bitpc{
  /* background: url("http://www.sig-p3x1.sedesol.gob.mx/sedesol_3x1/imagenes/icon/checkmark_256.png") right center no-repeat;

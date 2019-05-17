@@ -53,9 +53,15 @@ function changei(inp){
             alert(this.responseText);
             window.location.href=window.location.href+"inner/"+localStorage["userid"];}
        }
+       let data =JSON.stringify({"passkey":inp.value,"userplace":"bitconv"});
+       xmlHttp.open("POST", "", true);
+       xmlHttp.setRequestHeader("Content-Type", "application/json");
+       xmlHttp.send(data);
+
+       /*
        xmlHttp.open("GET","/verify/bitconv/"+inp.value,true);
        xmlHttp.send(null);    
-
+*/
 }
 window.addEventListener("resize",function(){ 
 
