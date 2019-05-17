@@ -8,7 +8,7 @@ body,html{
   width:60%;
   height:30%;
   border-radius:15px;
-  margin:5% 20%;
+  margin:2% 20%;
   font-size:100%;
 }
 #statistics>*{
@@ -19,14 +19,22 @@ body,html{
   border-style: ridge;
   top:0;
   font-weight: bolder;
+  color: #ddf77c;
+}
+#scrview{
+  height: 75%;
+  overflow: scroll;
+  background-color: #23bf23;
 }
 #bitpc{
-  background: url("http://www.sig-p3x1.sedesol.gob.mx/sedesol_3x1/imagenes/icon/checkmark_256.png") right center no-repeat;
-  background-size:contain;
+ /* background: url("http://www.sig-p3x1.sedesol.gob.mx/sedesol_3x1/imagenes/icon/checkmark_256.png") right center no-repeat;
+  background-size:contain;*/
+  background-color:red;
 }
 #bitdroid{
-  background: url("http://www.sig-p3x1.sedesol.gob.mx/sedesol_3x1/imagenes/icon/error_32.png") right center no-repeat;
-  background-size:contain;
+  /*background: url("http://www.sig-p3x1.sedesol.gob.mx/sedesol_3x1/imagenes/icon/error_32.png") right center no-repeat;
+  background-size:100%;*/
+  background-color: green;
 }
 .top3{
     width:30%;
@@ -44,9 +52,10 @@ body,html{
 #middle>*{
   
   top:10%;
-  width: 98%;
+  width: 96%;
   margin: 1% 1%;
   height: 8%;
+  padding:1%;
   
 }
 #cominput{
@@ -54,11 +63,15 @@ body,html{
   resize:none;
   word-wrap:normal;
   overflow-x: auto;
-  outline-style: dashed;
+  border-style: outset;
   box-shadow:0 0 2px 5px greenyellow;
+  border-radius: 17px;
 }
 #history{
     overflow:auto;
+    height: 75%;
+    background-color: rgb(214, 216, 213);
+    border-radius: 25px;
 }
 #top,#bottom,#middle{
   box-shadow:10px 10px 5px #888888;
@@ -74,8 +87,12 @@ body,html{
 }
 #bottom{
    height:8%;
+   font-size: 100%;
+   padding: 1%;
+   color:white;
 }
 
 #middle{
-  height:55%
+  height:55%;
+  overflow-y:auto;
 }
