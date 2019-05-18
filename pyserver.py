@@ -1,6 +1,6 @@
 from flask import Flask,send_from_directory,render_template,session,redirect,url_for
 import os
-from flask import request
+from flask import request,jsonify
 import re
 from flask_sqlalchemy import SQLAlchemy
 import sys
@@ -17,16 +17,18 @@ db=SQLAlchemy(app)
 class userlogins(db.Model):
    __tablename__="userlogins"
    #slno = db.Column('slno', db.Integer,autoincrement=True)
+   ipadr=db.Column("ipadr",db.String(30))
    userid = db.Column('userid',db.Integer,primary_key=True)
    userplace = db.Column("userplace",db.String(10))
    rtime = db.Column("rtime",db.Integer) 
    logined = db.Column("logined",db.Boolean)
 
-   def __init__(self,userid,userplace,rtime,logined):
+   def __init__(self,userid,userplace,rtime,logined,ipadr):
     self.userid = userid
     self.userplace = userplace
     self.rtime = rtime
     self.logined = logined
+    self.ipadr=ipadr
 
 class commdb(db.Model):
     __tablename__="commdb"
@@ -48,18 +50,7 @@ class commdb(db.Model):
 @app.route("/path/<path:subpath>")
 def path_finder(subpath):
     return send_from_directory(app.root_path,subpath,cache_timeout=0)
-'''
-@app.route("/verify/<userplace>/<passkey>")
-def verify(userplace,passkey):
-    print("verifiction started")
-    if passkey.find("1234")!=-1 and userplace=="bitconv":
-        idtem=int(time.time())
-        useradd(userplace,idtem)
-        print("new user with id:"+str(idtem))
-        return str(idtem)
-    else:
-        return "false"   
-'''
+
 
 @app.route("/inner/<int:userid>")
 def inner(userid):
@@ -73,11 +64,9 @@ def inner(userid):
           return send_from_directory(app.root_path,"innerpanel.html",cache_timeout=0)
     else:
         return redirect(url_for("home"))
-    '''
-    if not session.get("logged_in",False):
-        return redirect(url_for("home"))
-    return "<<<<<<<<<<     TERMINAL UNDER CONSTRUCTION     >>>>>>>>>>>>>>>"
-    '''
+
+
+
 @app.route("/chkonline",methods=["GET","POST"])
 def checkonline():
     content=request.get_json()
@@ -104,10 +93,7 @@ def checkonline():
 
   
 
-def useradd(userplace,time):
-    db.session.add(userlogins(time,userplace,time,True))
-    db.session.commit()
-    print("user added from ip:" +request.remote_addr)
+
 
 @app.route("/inner/usupd/<userplace>/<int:userid>")
 @app.route("/usupd/<userplace>/<int:userid>")
@@ -139,7 +125,7 @@ def home():
     if content['passkey'].find("1234")!=-1 and content["userplace"]=="bitconv":
         idtem=int(time.time())
         useradd(content["userplace"],idtem)
-        print("new user with id:"+str(idtem))
+        print("new user with id:"+request.headers['X-Forwarded-For'])
         return str(idtem)
     else:
         return "false"
@@ -154,6 +140,40 @@ def logo():
 def not_found(error):
     return "You have gone the wrong way.......Sry.......", 404
 
+def useradd(userplace,time):
+    if not request.headers.getlist("X-Forwarded-For"):
+        ip = request.remote_addr
+    else:
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    db.session.add(userlogins(time,userplace,time,True,ip))
+    db.session.commit()
+    print("user added from ip:" +ip)
+
+@app.route("/msend",methods=["POST"])
+def msgsender():
+    content=request.get_json()
+    db.session.add(commdb(content["userid"],content["userplace"],content["msg"],content["etime"],""))
+    db.session.commit()
+    print("MSg:"+content["msg"],"\nfrom user"+content["userid"])
+    return "t"
+
+@app.route("/gmsgs/<userid>/<int:numb>")    
+def getmsg(userid,numb):
+    try:
+       mesgs=commdb.query.order_by(commdb.etime.desc())[:int(numb)]
+    except IndexError:
+        mesgs=commdb.query.order_by(commdb.etime).all()  
+    #print(mesgs)
+    rmsg={}
+    rmsg["num_of_res"]=len(mesgs)
+    for m in range(len(mesgs)):
+        rmsg[m]={"slno":mesgs[m].slno,"userid":mesgs[m].userid,"userplace":mesgs[m].userplace,"comm":mesgs[m].comm,"etime":mesgs[m].etime}
+        #print(rmsg[m])
+    return json.dumps(rmsg)
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+        db.session.remove()
 
 if __name__ == '__main__':
    app.secret_key=os.urandom(12)

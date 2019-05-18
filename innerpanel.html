@@ -2,6 +2,7 @@
 <head>
     <title>BIT PANEL</title>
     <meta charset="utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
     <link href="path/panelcss.css" rel="stylesheet">
 </head>
 <body style="height:100%" background="path/bgimage.jpg">
@@ -20,14 +21,38 @@
                 USER ID
         </div>
         <div id="scrview">
-              LOADING......
+              LOADING BITPC.........
         </div>
     </div>
 </div>
 
-<div id="middle">
-     <textarea id="cominput" placeholder=">> Ctrl + S to SEND........." oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'></textarea>
-     <div id='history'>LOADING YOUR PAST.........</div>
+<div id="middle">   
+     <textarea id="cominput" placeholder=">> YOUR COMMAND HERE........." oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'></textarea>
+     <button id="sendb" onclick="sendmsg()">SEND</button>
+     <div id='history'>
+        <table id="thist" border="0">
+            <tr>
+                <td class="tdata">userid<br>userplace<br>time</td>
+                <td class="tcomm">Loading your past........</td>
+            </tr>
+            <tr>
+                <td class="tdata">userid<br>userplace<br>time</td>
+                <td class="tcomm">Loading your past........</td>
+            </tr>
+            <tr>
+                <td class="tdata">userid<br>userplace<br>time</td>
+                <td class="tcomm">Loading your past........</td>
+            </tr>
+            <tr>
+                <td class="tdata">userid<br>userplace<br>time</td>
+                <td class="tcomm">Loading your past........</td>
+            </tr>
+            <tr>
+                <td class="tdata">userid<br>userplace<br>time</td>
+                <td class="tcomm">Loading your past........</td>
+            </tr>
+        </table>
+     </div>
 </div>
 
 
