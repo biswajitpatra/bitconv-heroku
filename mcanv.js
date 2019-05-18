@@ -186,7 +186,7 @@ function passkey(elem){
                 alert(this.responseText);
                 window.location.href=window.location.href+"inner/"+localStorage["userid"];}
            }
-       let data =JSON.stringify({"passkey":pasw,"userplace":"bitconv"});
+       let data =JSON.stringify({"passkey":passw,"userplace":"bitconv"});
        xmlHttp.open("POST", "", true);
        xmlHttp.setRequestHeader("Content-Type", "application/json");
        xmlHttp.send(data);

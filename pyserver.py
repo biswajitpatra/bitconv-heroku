@@ -107,16 +107,23 @@ def checkonline():
 def useradd(userplace,time):
     db.session.add(userlogins(time,userplace,time,True))
     db.session.commit()
-    print("user added")
+    print("user added from ip:" +request.remote_addr)
 
 @app.route("/inner/usupd/<userplace>/<int:userid>")
 @app.route("/usupd/<userplace>/<int:userid>")
 def userupdate(userplace,userid):
     user=userlogins.query.filter_by(userid=userid).first()
-    user.rtime=int(time.time())
-    db.session.commit()
-    print("user updated")
-    return "true"
+    if user==None:
+        return "f"
+    elif user.logined==True and int(time.time())-user.rtime < 15:
+          user.rtime=int(time.time())
+          db.session.commit()
+          print("user updated")
+          return "t"
+    else:
+        print("user late retreival")
+        return "f"
+    return "t"
     
 @app.route("/",methods=["GET","POST"])
 def home():
