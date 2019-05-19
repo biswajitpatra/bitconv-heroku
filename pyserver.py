@@ -6,17 +6,33 @@ from flask_sqlalchemy import SQLAlchemy
 import sys
 import json
 import time
+from flask_socketio import send, emit,SocketIO,socketio
 
+#TODO:add socketio protocols for sending and receiving 
 
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://anexryhdcxxdgn:8192aad9befb811ce91a03600785af2711b14bb5721c1e3b402294d826d6b3ab@ec2-75-101-147-226.compute-1.amazonaws.com:5432/dr95m80gttmdo'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]=False
 db=SQLAlchemy(app)
+socketio=SocketIO(app)
 
+
+slnoforcommt=0
+
+
+class stattable(db.Model):
+    __tablename__="stattable"
+    slno = db.Column('slno', db.Integer,autoincrement=True,primary_key=True)
+    comm=db.Column("comm",db.String(100))
+    etime = db.Column("etime",db.Integer)
+
+    def __init__(self,comm,etime):
+        self.comm=comm
+        self.etime=etime
 
 class userlogins(db.Model):
    __tablename__="userlogins"
-   #slno = db.Column('slno', db.Integer,autoincrement=True)
+   slno = db.Column('slno', db.Integer,autoincrement=True)
    ipadr=db.Column("ipadr",db.String(30))
    userid = db.Column('userid',db.Integer,primary_key=True)
    userplace = db.Column("userplace",db.String(10))
@@ -46,11 +62,22 @@ class commdb(db.Model):
        self.seenid=seenid
 
 
+
+@socketio.on("connected")
+def conn(msg):
+    print("connected")
+    socketio.emit("update")
+@socketio.on('disconnect')
+def test_disconnect(json):
+    user=userlogins.query.filter_by(userid=content["userid"]).first()
+    user.logined=False
+    db.session.commit()
+    print('user disconected')
+
 @app.route("/inner/path/<path:subpath>")
 @app.route("/path/<path:subpath>")
 def path_finder(subpath):
     return send_from_directory(app.root_path,subpath,cache_timeout=0)
-
 
 @app.route("/inner/<int:userid>")
 def inner(userid):
@@ -67,9 +94,13 @@ def inner(userid):
 
 
 
-@app.route("/chkonline",methods=["GET","POST"])
+@app.route("/chkonline",methods=["POST"])
 def checkonline():
     content=request.get_json()
+    return checkonlinemain(content)
+
+
+def checkonlinemain(content):
     if "userid" in content.keys():
         user=userlogins.query.filter_by(userid=content["userid"]).first()
         if user ==None:
@@ -90,7 +121,7 @@ def checkonline():
                 else:
                   rdata=rdata+ str(u.userid)+":f,"
             return rdata
-
+   
   
 
 
@@ -125,7 +156,7 @@ def home():
     if content['passkey'].find("1234")!=-1 and content["userplace"]=="bitconv":
         idtem=int(time.time())
         useradd(content["userplace"],idtem)
-        print("new user with id:"+request.headers['X-Forwarded-For'])
+        print("new user with id:"+str(idtem))
         return str(idtem)
     else:
         return "false"
@@ -136,26 +167,35 @@ def logo():
 
 
 
-@app.errorhandler(404)
-def not_found(error):
-    return "You have gone the wrong way.......Sry.......", 404
-
-def useradd(userplace,time):
-    if not request.headers.getlist("X-Forwarded-For"):
-        ip = request.remote_addr
-    else:
-        ip = request.headers.getlist("X-Forwarded-For")[0]
-    db.session.add(userlogins(time,userplace,time,True,ip))
+@socketio.on("msend")
+def msgsendersock(json):
+  global slnoforcommt
+  if "t" in checkonlinemain(json):
+    db.session.add(commdb(json["userid"],json["userplace"],json["msg"],json["etime"],""))
     db.session.commit()
-    print("user added from ip:" +ip)
+    print("MSg:"+json["msg"],"\nfrom user"+json["userid"])
+    
+    if(slnoforcommt==0):
+         mesgs=commdb.query.order_by(commdb.etime.desc()).first()
+         slnoforcommt=mesgs.slno
+    else:
+        slnoforcommt+=1     
+    rmsg={"slno":slnoforcommt,"userid":json["userid"],"userplace":json["userplace"],"comm":json["msg"],"etime":json["etime"]}
+    socketio.emit('update',rmsg, broadcast=True)
 
 @app.route("/msend",methods=["POST"])
 def msgsender():
-    content=request.get_json()
+  content=request.get_json()
+  if "t" in checkonlinemain(content):
     db.session.add(commdb(content["userid"],content["userplace"],content["msg"],content["etime"],""))
     db.session.commit()
     print("MSg:"+content["msg"],"\nfrom user"+content["userid"])
     return "t"
+  else:
+    return "f"  
+
+
+
 
 @app.route("/gmsgs/<userid>/<int:numb>")    
 def getmsg(userid,numb):
@@ -171,11 +211,38 @@ def getmsg(userid,numb):
         #print(rmsg[m])
     return json.dumps(rmsg)
 
+
+
 @app.teardown_appcontext
 def shutdown_session(exception=None):
         db.session.remove()
 
+
+@app.errorhandler(404)
+def not_found(error):
+    return "You have gone the wrong way.......Sry.......", 404
+
+def useradd(userplace,time):
+    #if not request.headers.getlist("X-Forwarded-For"):
+    #    ip = request.remote_addr
+    #else:
+    #    ip = request.headers.getlist("X-Forwarded-For")[0]
+    db.session.add(userlogins(time,userplace,time,True,""))
+    db.session.commit()
+    #print("user added from ip:" +ip)
+
+
+def add_stat(comm):
+    etime=int(time.time())
+    db.session.add(stattable(comm,etime))
+    db.session.commit()
+    socketio.emit("updatestat",{"comm":comm,"etime":etime},broadcast=True)
+
+
+
+
 if __name__ == '__main__':
    app.secret_key=os.urandom(12)
    #db.create_all()
-   app.run(debug = True)
+   socketio.run(app)
+   #app.run(debug = True)
