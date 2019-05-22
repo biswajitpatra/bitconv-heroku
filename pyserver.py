@@ -8,7 +8,7 @@ import json
 import time
 from flask_socketio import send, emit,SocketIO,socketio
 
-#TODO:add socketio protocols for sending and receiving 
+#TODO:pip eventlet while using heroku
 
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://anexryhdcxxdgn:8192aad9befb811ce91a03600785af2711b14bb5721c1e3b402294d826d6b3ab@ec2-75-101-147-226.compute-1.amazonaws.com:5432/dr95m80gttmdo'
@@ -67,13 +67,28 @@ class commdb(db.Model):
 def conn(msg):
     print("connected")
     socketio.emit("update")
+    etime=int(time.time())
+    users=userlogins.query.filter(userlogins.rtime <= etime).all()
+    rmsg={}
+    rmsg["length_json"]=len(users)
+    for u in range(len(users)):
+        rmsg[u]={"userid":users[u].userid,"userplace":users[u].userplace}
+    #TODO:::::::::::::::
+    socketio.emit("online_check",rmsg,broadcast=True)
+
 @socketio.on('disconnect')
-def test_disconnect(json):
-    user=userlogins.query.filter_by(userid=content["userid"]).first()
-    user.logined=False
-    db.session.commit()
+def test_disconnect():
+    etime=int(time.time())
+    users=userlogins.query.filter(userlogins.rtime <= etime).all()
+    rmsg={}
+    rmsg["length_json"]=len(users)
+    for u in range(len(users)):
+        rmsg[u]={"userid":users[u].userid,"userplace":users[u].userplace}
+    #TODO:::::::::::::::
+    socketio.emit("online_check",rmsg,broadcast=True)
     print('user disconected')
 
+    
 @app.route("/inner/path/<path:subpath>")
 @app.route("/path/<path:subpath>")
 def path_finder(subpath):
@@ -88,6 +103,7 @@ def inner(userid):
     if user.logined==True and int(time.time())-user.rtime < 15:
           user.rtime=int(time.time())
           db.session.commit()
+          add_stat(str(userid)+" in inner")
           return send_from_directory(app.root_path,"innerpanel.html",cache_timeout=0)
     else:
         return redirect(url_for("home"))
@@ -98,6 +114,7 @@ def inner(userid):
 def checkonline():
     content=request.get_json()
     return checkonlinemain(content)
+
 
 
 def checkonlinemain(content):
@@ -123,8 +140,6 @@ def checkonlinemain(content):
             return rdata
    
   
-
-
 
 @app.route("/inner/usupd/<userplace>/<int:userid>")
 @app.route("/usupd/<userplace>/<int:userid>")
@@ -195,10 +210,9 @@ def msgsender():
     return "f"  
 
 
-
-
 @app.route("/gmsgs/<userid>/<int:numb>")    
 def getmsg(userid,numb):
+  if "t" in checkonlinemain({"userid":userid}):
     try:
        mesgs=commdb.query.order_by(commdb.etime.desc())[:int(numb)]
     except IndexError:
@@ -210,7 +224,8 @@ def getmsg(userid,numb):
         rmsg[m]={"slno":mesgs[m].slno,"userid":mesgs[m].userid,"userplace":mesgs[m].userplace,"comm":mesgs[m].comm,"etime":mesgs[m].etime}
         #print(rmsg[m])
     return json.dumps(rmsg)
-
+  else:
+      return 404
 
 
 @app.teardown_appcontext
@@ -223,12 +238,14 @@ def not_found(error):
     return "You have gone the wrong way.......Sry.......", 404
 
 def useradd(userplace,time):
+    ip=""
     #if not request.headers.getlist("X-Forwarded-For"):
     #    ip = request.remote_addr
     #else:
     #    ip = request.headers.getlist("X-Forwarded-For")[0]
-    db.session.add(userlogins(time,userplace,time,True,""))
+    db.session.add(userlogins(time,userplace,time,True,ip))
     db.session.commit()
+    add_stat("new user added id:"+str(time)+" and ip:"+str(ip))
     #print("user added from ip:" +ip)
 
 
@@ -242,7 +259,9 @@ def add_stat(comm):
 
 
 if __name__ == '__main__':
+   #print("done")
    app.secret_key=os.urandom(12)
+   #print("done2")
    #db.create_all()
    socketio.run(app)
    #app.run(debug = True)

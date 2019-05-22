@@ -4,17 +4,20 @@
 var socket = io.connect('https://' + document.domain + ':' + location.port);
     socket.on('connect', function() {
         socket.emit('connected', {data: 'I\'m connected!'});
+        socket.on("disconnect",function(){
+            document.location.reload();
+        });
     });
 socket.on("updatestat",function(arg){
        if(arg==undefined||arg==null){
                
        }
        else{
-           let slist=documetn.getElementById("scrview").getElementsByTagName("ul");
+           let slist=document.getElementById("scrview").getElementsByTagName("li");
            for(i=4;i>0;i--){
-               slist.getElementsByTagName("li")[i-1]=slist.getElementsByTagName("li")[i];
+               slist[i].innerHTML=slist[i-1].innerHTML;
            }
-           slist.getElementsByTagName("li")[0].innerText="("+arg["etime"]+") "+arg["comm"];
+           slist[0].innerText="("+arg["etime"]+") "+arg["comm"];
        }
 })
 socket.on("update",updatecommh);
