@@ -1,9 +1,9 @@
 
 
 
-var socket = io.connect('https://' + document.domain + ':' + location.port);
+var socket = io.connect('https://' + document.domain + ':' + location.port,{query:"userid="+localStorage["userid"]});
     socket.on('connect', function() {
-        socket.emit('connected', {data: 'I\'m connected!'});
+        socket.emit('connected', {data:localStorage["userid"]});
         socket.on("disconnect",function(){
             document.location.reload();
         });
@@ -19,7 +19,16 @@ socket.on("updatestat",function(arg){
            }
            slist[0].innerText="("+arg["etime"]+") "+arg["comm"];
        }
-})
+});
+
+socket.on("online_check",function(rmsg){
+        for(i=0;i<rmsg["length_json"];i++){
+			
+			
+		}
+
+});
+
 socket.on("update",updatecommh);
 function updatecommh(arg){
     if(arg===undefined || arg===null){

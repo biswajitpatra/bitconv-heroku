@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 import sys
 import json
 import time
-from flask_socketio import send, emit,SocketIO,socketio
+from flask_socketio import send, emit,SocketIO,socketio,disconnect
 
 #TODO:pip eventlet while using heroku
 
@@ -62,6 +62,18 @@ class commdb(db.Model):
        self.seenid=seenid
 
 
+@socketio.on("connect")
+def main_conn():
+    userid=request.args.get("userid")
+    user=userlogins.query.filter_by(userid=userid).first()
+    if user==None:
+        disconnect()
+    if user.logined==True and int(time.time())-user.rtime < 15:
+          print("user connected socketio")
+    else:
+        disconnect()
+        
+    
 
 @socketio.on("connected")
 def conn(msg):
@@ -168,7 +180,12 @@ def home():
  else:
     print("verifiction started")
     content=request.get_json()
-    if content['passkey'].find("1234")!=-1 and content["userplace"]=="bitconv":
+    if content["userplace"]=="bitpc":
+        idtem=int(time.time())
+        useradd(content["userplace"],idtem)
+        print("new user with id:"+str(idtem))
+        return str(idtem)
+    elif content['passkey'].find("1234")!=-1 and content["userplace"]=="bitconv":
         idtem=int(time.time())
         useradd(content["userplace"],idtem)
         print("new user with id:"+str(idtem))
