@@ -65,7 +65,7 @@ class commdb(db.Model):
 @socketio.on("connect")
 def main_conn():
     userid=request.args.get("userid")
-    user=userlogins.query.filter_by(userid=userid).first()
+    user=userlogins.query.filter_by(userid=int(userid)).first()
     print("socket connected user:",user)
     if user==None:
         disconnect()
@@ -136,7 +136,9 @@ def checkonlinemain(content):
         user=userlogins.query.filter_by(userid=content["userid"]).first()
         if user ==None:
             return "n"
-        if user.logined==True and int(time.time())-user.rtime < 15:
+        elif user.userplace=="bitpc":
+            return str(user.userid)+":t,"
+        elif user.logined==True and int(time.time())-user.rtime < 15:
             return str(user.userid)+":t,"
         else:
             return str(user.userid)+":f,"
