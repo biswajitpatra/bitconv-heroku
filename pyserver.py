@@ -69,7 +69,7 @@ def main_conn():
     print("socket connected user:",user)
     if user==None:
         disconnect()
-    if user.logined==True and int(time.time())-user.rtime < 15:
+    elif user.logined==True and int(time.time())-user.rtime < 15:
           print("user connected socketio")
     else:
         disconnect()
