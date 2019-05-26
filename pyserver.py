@@ -91,6 +91,7 @@ def conn(msg):
 @socketio.on('disconnect')
 def test_disconnect():
     etime=int(time.time())
+    add_stat("A user disconnects")
     users=userlogins.query.filter(userlogins.rtime <= etime).all()
     rmsg={}
     rmsg["length_json"]=len(users)
@@ -149,7 +150,7 @@ def checkonlinemain(content):
                   rdata=rdata+ str(u.userid)+":t,"
                 else:
                   rdata=rdata+ str(u.userid)+":f,"
-            return rdata
+            return rdata[:-1]
    
   
 
