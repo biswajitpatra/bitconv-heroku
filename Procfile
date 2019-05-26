@@ -1,1 +1,1 @@
-web: gunicorn --worker-class eventlet -w 4 --log-file=- pyserver:app
+web: gunicorn --worker-class eventlet -w 1 --log-file=- pyserver:app

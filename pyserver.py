@@ -158,7 +158,7 @@ def checkonlinemain(content):
 @app.route("/inner/usupd/<userplace>/<int:userid>")
 @app.route("/usupd/<userplace>/<int:userid>")
 def userupdate(userplace,userid):
-    user=userlogins.query.filter_by(userid=userid).first()
+    user=userlogins.query.filter_by(userid=int(userid)).first()
     if user==None:
         return "f"
     elif user.logined==True and int(time.time())-user.rtime < 15:
