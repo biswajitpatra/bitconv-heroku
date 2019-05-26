@@ -66,6 +66,7 @@ class commdb(db.Model):
 def main_conn():
     userid=request.args.get("userid")
     user=userlogins.query.filter_by(userid=userid).first()
+    print("socket connected user:",user)
     if user==None:
         disconnect()
     if user.logined==True and int(time.time())-user.rtime < 15:
