@@ -8,10 +8,13 @@ import json
 import time
 from flask_socketio import send, emit,SocketIO,socketio,disconnect
 
-#TODO:pip eventlet while using heroku
+###########################################################
+###########TODO:pip eventlet while using heroku###############################################################################################>>>>>>>
+######################################################
 
 app=Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://anexryhdcxxdgn:8192aad9befb811ce91a03600785af2711b14bb5721c1e3b402294d826d6b3ab@ec2-75-101-147-226.compute-1.amazonaws.com:5432/dr95m80gttmdo'
+
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://anexryhdcxxdgn:8192aad9befb811ce91a03600785af2711b14bb5721c1e3b402294d826d6b3ab@ec2-75-101-147-226.compute-1.amazonaws.com:5432/dr95m80gttmdo'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]=False
 db=SQLAlchemy(app)
 socketio=SocketIO(app)
