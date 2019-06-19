@@ -9,12 +9,13 @@ import time
 from flask_socketio import send, emit,SocketIO,socketio,disconnect
 
 ###########################################################
-###########TODO:pip eventlet while using heroku###############################################################################################>>>>>>>
+###########TODO:pip eventlet while using heroku
+###########TODO:add ip address while deploying ###############################################################################################>>>>>>>
 ######################################################
 
 app=Flask(__name__)
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://anexryhdcxxdgn:8192aad9befb811ce91a03600785af2711b14bb5721c1e3b402294d826d6b3ab@ec2-75-101-147-226.compute-1.amazonaws.com:5432/dr95m80gttmdo'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://kfwdmchtrvjutr:e16f5ad955062bec12c557a3da5c04e9ab20cbd74df8f867092f2737ffe6de8c@ec2-54-235-104-136.compute-1.amazonaws.com:5432/d5qk9k31qkg616'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL","error")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]=False
 db=SQLAlchemy(app)
@@ -23,6 +24,16 @@ socketio=SocketIO(app)
 
 slnoforcommt=0
 
+class filestore(db.Model):
+    __tablename__="filestore"
+    slno=db.Column('slno', db.Integer,autoincrement=True,primary_key=True)
+    userid = db.Column('userid',db.Integer)
+    naof=db.Column("comm",db.String(20))
+    etime = db.Column("etime",db.Integer)
+    def __init__(self,userid,naof):
+        self.userid=userid
+        self.naof=naof
+        self.etime=int(time.time())
 
 class stattable(db.Model):
     __tablename__="stattable"
@@ -85,24 +96,22 @@ def conn(msg):
     print("connected")
     socketio.emit("update")
     etime=int(time.time())
-    users=userlogins.query.filter(userlogins.rtime <= etime).all()
+    users=userlogins.query.filter(userlogins.rtime >= etime-8).all()
     rmsg={}
     rmsg["length_json"]=len(users)
     for u in range(len(users)):
         rmsg[u]={"userid":users[u].userid,"userplace":users[u].userplace}
-    #TODO:::::::::::::::
     socketio.emit("online_check",rmsg,broadcast=True)
 
 @socketio.on('disconnect')
 def test_disconnect():
     etime=int(time.time())
     add_stat("A user disconnects")
-    users=userlogins.query.filter(userlogins.rtime <= etime).all()
+    users=userlogins.query.filter(userlogins.rtime >= etime-8).all()
     rmsg={}
     rmsg["length_json"]=len(users)
     for u in range(len(users)):
         rmsg[u]={"userid":users[u].userid,"userplace":users[u].userplace}
-    #TODO:::::::::::::::
     socketio.emit("online_check",rmsg,broadcast=True)
     print('user disconected')
 
@@ -211,7 +220,7 @@ def logo():
 def msgsendersock(json):
   global slnoforcommt
   if "t" in checkonlinemain(json):
-    db.session.add(commdb(json["userid"],json["userplace"],json["msg"],json["etime"],""))
+    db.session.add(commdb(json["userid"],json["userplace"],json["msg"][:100],json["etime"],""))
     db.session.commit()
     print("MSg:"+json["msg"],"\nfrom user"+json["userid"])
     
@@ -221,13 +230,18 @@ def msgsendersock(json):
     else:
         slnoforcommt+=1     
     rmsg={"slno":slnoforcommt,"userid":json["userid"],"userplace":json["userplace"],"comm":json["msg"],"etime":json["etime"]}
+    if "filesl" in json:
+        urmsg=rmsg.split("\n")[0]
+        if urmsg=='':
+            socketio.emit("fsend")
+        #TODO:webrtc...........
     socketio.emit('update',rmsg, broadcast=True)
 
 @app.route("/msend",methods=["POST"])
 def msgsender():
   content=request.get_json()
   if "t" in checkonlinemain(content):
-    db.session.add(commdb(content["userid"],content["userplace"],content["msg"],content["etime"],""))
+    db.session.add(commdb(content["userid"],content["userplace"],content["msg"][:100],content["etime"],""))
     db.session.commit()
     print("MSg:"+content["msg"],"\nfrom user"+content["userid"])
     return "t"
@@ -271,7 +285,7 @@ def useradd(userplace,time):
     db.session.add(userlogins(time,userplace,time,True,ip))
     db.session.commit()
     add_stat("new user added id:"+str(time)+" and ip:"+str(ip))
-    #print("user added from ip:" +ip)
+    print("user added from ip:" +ip)
 
 
 def add_stat(comm):
