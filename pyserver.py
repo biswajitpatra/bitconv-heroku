@@ -7,19 +7,24 @@ import sys
 import json
 import time
 from flask_socketio import send, emit,SocketIO,socketio,disconnect
+from pyfcm import FCMNotification
 
 ###########################################################
-###########TODO:pip eventlet while using heroku
+###########TODO:pip install eventlet while using heroku
+###############:pip install gunicorn.......
 ###########TODO:add ip address while deploying ###############################################################################################>>>>>>>
 ######################################################
 
 app=Flask(__name__)
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://kfwdmchtrvjutr:e16f5ad955062bec12c557a3da5c04e9ab20cbd74df8f867092f2737ffe6de8c@ec2-54-235-104-136.compute-1.amazonaws.com:5432/d5qk9k31qkg616'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL","error")
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://kfwdmchtrvjutr:e16f5ad955062bec12c557a3da5c04e9ab20cbd74df8f867092f2737ffe6de8c@ec2-54-235-104-136.compute-1.amazonaws.com:5432/d5qk9k31qkg616'
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL","error")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]=False
 db=SQLAlchemy(app)
 socketio=SocketIO(app)
+
+
+push_service = FCMNotification(api_key="AIzaSyAM2uOt1DmvdEhV_84Sd5qm8M5kfWeMD98")
 
 
 slnoforcommt=0
@@ -76,6 +81,13 @@ class commdb(db.Model):
        self.comm=comm
        self.seenid=seenid
 
+class key_pair(db.Model):
+    __tablename__="keypair"
+    key=db.Column("key",db.String(300),primary_key=True)
+    value=db.Column("value",db.String(300))
+    def __init__(self,key,value):
+        self.key=key
+        self.value=value
 
 @socketio.on("connect")
 def main_conn():
@@ -150,6 +162,8 @@ def checkonlinemain(content):
         if user ==None:
             return "n"
         elif user.userplace=="bitpc":
+            return str(user.userid)+":t,"
+        elif user.userplace=="bitdroid":
             return str(user.userid)+":t,"
         elif user.logined==True and int(time.time())-user.rtime < 15:
             return str(user.userid)+":t,"
@@ -234,7 +248,7 @@ def msgsendersock(json):
         urmsg=rmsg.split("\n")[0]
         if urmsg=='':
             socketio.emit("fsend")
-        #TODO:webrtc...........
+        #TODO:webrtc...........and socketio
     socketio.emit('update',rmsg, broadcast=True)
 
 @app.route("/msend",methods=["POST"])
@@ -293,6 +307,31 @@ def add_stat(comm):
     db.session.add(stattable(comm,etime))
     db.session.commit()
     socketio.emit("updatestat",{"comm":comm,"etime":etime},broadcast=True)
+    send_android({"type":"updatestat","comm":comm,"etime":etime})
+
+######for android
+@app.route("/andupd/<token>/<ip>")
+def andupdate(token,ip):
+    anduser=key_pair.query.filter_by(key="andtoken").first()
+    if anduser==None:
+        db.session.add(key_pair("andtoken",token))
+        db.session.commit()
+    else:
+        anduser.value=token
+        db.session.commit()
+
+def send_android(js_send):
+    anduser=key_pair.query.filter_by(key="andtoken").first()
+    if anduser==None:
+        print("No user registered")
+        return
+    result = push_service.notify_single_device(registration_id=anduser.value, data_message=js_send)
+    print(result)
+
+
+        
+
+
 
 
 
