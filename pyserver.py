@@ -17,14 +17,14 @@ from pyfcm import FCMNotification
 
 app=Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://kfwdmchtrvjutr:e16f5ad955062bec12c557a3da5c04e9ab20cbd74df8f867092f2737ffe6de8c@ec2-54-235-104-136.compute-1.amazonaws.com:5432/d5qk9k31qkg616'
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL","error")
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://kfwdmchtrvjutr:e16f5ad955062bec12c557a3da5c04e9ab20cbd74df8f867092f2737ffe6de8c@ec2-54-235-104-136.compute-1.amazonaws.com:5432/d5qk9k31qkg616'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL","error")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]=False
 db=SQLAlchemy(app)
 socketio=SocketIO(app)
 
 
-push_service = FCMNotification(api_key="AIzaSyAM2uOt1DmvdEhV_84Sd5qm8M5kfWeMD98")
+push_service = FCMNotification(api_key="AAAALb0py6M:APA91bEOOXI7rph7KXP4VhjYe_xApxZzmnjkX2a-3R3OxvhlZQXQx7w8YS6JK6KrRIiK6wXX5GzdCHlH9KRyir5tPnfQp_Ni0Hp6Oolnushxlb9bgTDq4vofY2LhpActkAqf_SdYS7_2")
 
 
 slnoforcommt=0
