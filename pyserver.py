@@ -96,6 +96,8 @@ def main_conn():
     print("socket connected user:",user)
     if user==None:
         disconnect()
+    elif userid=="111":
+        print("Bitdroid initiated..........")
     elif user.logined==True and int(time.time())-user.rtime < 15:
           print("user connected socketio")
     else:
