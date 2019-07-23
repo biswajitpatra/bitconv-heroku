@@ -160,7 +160,7 @@ def checkonline():
 
 def checkonlinemain(content):
     if "userid" in content.keys():
-        if content["userid"]==111:
+        if content["userid"]=="111":
             print("Android setup connected")
             return "111:t,"
         user=userlogins.query.filter_by(userid=content["userid"]).first()
