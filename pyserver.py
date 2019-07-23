@@ -94,10 +94,10 @@ def main_conn():
     userid=request.args.get("userid")
     user=userlogins.query.filter_by(userid=int(userid)).first()
     print("socket connected user:",user)
-    if user==None:
-        disconnect()
-    elif userid=="111":
+    if userid=="111":
         print("Bitdroid initiated..........")
+    elif user==None:
+        disconnect()
     elif user.logined==True and int(time.time())-user.rtime < 15:
           print("user connected socketio")
     else:
