@@ -158,6 +158,9 @@ def checkonline():
 
 def checkonlinemain(content):
     if "userid" in content.keys():
+        if content["userid"]==111:
+            print("Android setup connected")
+            return "111:t,"
         user=userlogins.query.filter_by(userid=content["userid"]).first()
         if user ==None:
             return "n"
@@ -212,6 +215,11 @@ def home():
     print("verifiction started")
     content=request.get_json()
     if content["userplace"]=="bitpc":
+        idtem=int(time.time())
+        useradd(content["userplace"],idtem)
+        print("new user with id:"+str(idtem))
+        return str(idtem)
+    elif content["userplace"]=="bitdroid":
         idtem=int(time.time())
         useradd(content["userplace"],idtem)
         print("new user with id:"+str(idtem))
