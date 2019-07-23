@@ -320,8 +320,9 @@ def add_stat(comm):
     send_android({"type":"updatestat","comm":comm,"etime":etime})
 
 ######for android
-@app.route("/andupd/<token>")
-def andupdate(token):
+@app.route("/andupd",methods=["POST"])
+def andupdate():
+    token=request.form["token"]
     anduser=key_pair.query.filter_by(key="andtoken").first()
     if anduser==None:
         db.session.add(key_pair("andtoken",token))
