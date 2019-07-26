@@ -260,7 +260,7 @@ def msgsendersock(json):
             socketio.emit("fsend")
         #TODO:webrtc...........and socketio
     socketio.emit('update',rmsg, broadcast=True)
-    send_android({"type":"update","slno":slnoforcommt,"userid":json["userid"],"userplace":json["userplace"],"comm":json["msg"],"etime":json["etime"])
+    send_android({"type":"update","slno":slnoforcommt,"userid":json["userid"],"userplace":json["userplace"],"comm":json["msg"],"etime":json["etime"]})
 
 @app.route("/msend",methods=["POST"])
 def msgsender():
